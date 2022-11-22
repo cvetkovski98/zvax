@@ -1,0 +1,331 @@
+{
+  "openapi": "3.0.2",
+  "info": { "title": "Vaccination Appointment Service", "version": "0.1.0" },
+  "servers": [{ "url": "/appointments" }],
+  "paths": {
+    "/list": {
+      "get": {
+        "summary": "List Days In Week",
+        "operationId": "list_days_in_week_list_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "From Date",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "from_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List Days In Week List Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DaySchema" }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/daily": {
+      "get": {
+        "summary": "List Slots For Day",
+        "operationId": "list_slots_for_day_daily_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "title": "Day", "type": "string", "format": "date" },
+            "name": "day",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List Slots For Day Daily Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SlotSchema" }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reserve": {
+      "post": {
+        "summary": "Create Reservation",
+        "operationId": "create_reservation_reserve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReservationRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Reservation" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/book": {
+      "post": {
+        "summary": "Confirm Reservation",
+        "operationId": "confirm_reservation_book_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmReservationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mq/book": {
+      "post": {
+        "tags": ["Message Queue"],
+        "summary": "Create Reservation",
+        "operationId": "create_reservation_mq_book_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AppointmentCommand" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppointmentCommand": {
+        "title": "AppointmentCommand",
+        "required": ["appointments"],
+        "type": "object",
+        "properties": {
+          "appointments": {
+            "title": "Appointments",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AppointmentRequestSchema" }
+          }
+        }
+      },
+      "AppointmentRequestSchema": {
+        "title": "AppointmentRequestSchema",
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "birth_date",
+          "language",
+          "street",
+          "zip_code",
+          "city",
+          "country"
+        ],
+        "type": "object",
+        "properties": {
+          "first_name": { "title": "First Name", "type": "string" },
+          "last_name": { "title": "Last Name", "type": "string" },
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "birth_date": {
+            "title": "Birth Date",
+            "type": "string",
+            "format": "date"
+          },
+          "language": { "title": "Language", "type": "string" },
+          "street": { "title": "Street", "type": "string" },
+          "zip_code": { "title": "Zip Code", "type": "string" },
+          "city": { "title": "City", "type": "string" },
+          "country": { "title": "Country", "type": "string" }
+        }
+      },
+      "ConfirmReservationRequest": {
+        "title": "ConfirmReservationRequest",
+        "required": ["slots", "reservation_id"],
+        "type": "object",
+        "properties": {
+          "slots": {
+            "title": "Slots",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SlotBookingRequestSchema" }
+          },
+          "reservation_id": { "title": "Reservation Id", "type": "string" }
+        }
+      },
+      "DaySchema": {
+        "title": "DaySchema",
+        "required": ["datetime_", "number_of_slots"],
+        "type": "object",
+        "properties": {
+          "datetime_": {
+            "title": "Datetime ",
+            "type": "string",
+            "format": "date-time"
+          },
+          "number_of_slots": {
+            "title": "Number Of Slots",
+            "minimum": 0.0,
+            "type": "integer"
+          }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ValidationError" }
+          }
+        }
+      },
+      "Reservation": {
+        "title": "Reservation",
+        "required": ["slots", "reservation_id"],
+        "type": "object",
+        "properties": {
+          "slots": {
+            "title": "Slots",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SlotSchema" }
+          },
+          "reservation_id": { "title": "Reservation Id", "type": "string" }
+        }
+      },
+      "ReservationRequest": {
+        "title": "ReservationRequest",
+        "required": ["slots"],
+        "type": "object",
+        "properties": {
+          "slots": {
+            "title": "Slots",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SlotBookingRequestSchema" }
+          }
+        }
+      },
+      "SlotBookingRequestSchema": {
+        "title": "SlotBookingRequestSchema",
+        "required": ["id_", "number_of_slots"],
+        "type": "object",
+        "properties": {
+          "id_": { "title": "Id ", "type": "integer" },
+          "number_of_slots": {
+            "title": "Number Of Slots",
+            "minimum": 0.0,
+            "type": "integer"
+          }
+        }
+      },
+      "SlotSchema": {
+        "title": "SlotSchema",
+        "required": ["id_", "datetime_", "number_of_slots"],
+        "type": "object",
+        "properties": {
+          "id_": { "title": "Id ", "type": "integer" },
+          "datetime_": {
+            "title": "Datetime ",
+            "type": "string",
+            "format": "date-time"
+          },
+          "number_of_slots": {
+            "title": "Number Of Slots",
+            "minimum": 0.0,
+            "type": "integer"
+          }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "msg": { "title": "Message", "type": "string" },
+          "type": { "title": "Error Type", "type": "string" }
+        }
+      }
+    }
+  }
+}

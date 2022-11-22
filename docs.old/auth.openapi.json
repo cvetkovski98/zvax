@@ -1,0 +1,232 @@
+{
+  "openapi": "3.0.2",
+  "info": { "title": "Vaccination Auth Service", "version": "0.1.0" },
+  "servers": [{ "url": "/auth" }],
+  "paths": {
+    "/public/register": {
+      "post": {
+        "tags": ["Public routes"],
+        "summary": "Register",
+        "description": "Register a client\n:return: The registered client",
+        "operationId": "register_public_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReadUserSchema" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/login": {
+      "post": {
+        "tags": ["Public routes"],
+        "summary": "Login",
+        "description": "Acquire an auth token providing correct credentials\n:return: The acquired auth token",
+        "operationId": "login_public_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CredentialSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenSchema" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/verify": {
+      "post": {
+        "tags": ["Public routes"],
+        "summary": "Verify",
+        "description": "Verify a provided email address\n:return: None",
+        "operationId": "verify_public_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyTokenRequestSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/request_verify": {
+      "post": {
+        "tags": ["Public routes"],
+        "summary": "Request Verify",
+        "description": "Request a resend of email verification email\n:return: None",
+        "operationId": "request_verify_public_request_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationRequestSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authorize": {
+      "get": {
+        "summary": "Authorize",
+        "operationId": "authorize_authorize_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateUserSchema": {
+        "title": "CreateUserSchema",
+        "required": ["email", "password", "confirm_password"],
+        "type": "object",
+        "properties": {
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "password": { "title": "Password", "type": "string" },
+          "confirm_password": { "title": "Confirm Password", "type": "string" }
+        }
+      },
+      "CredentialSchema": {
+        "title": "CredentialSchema",
+        "required": ["email", "password"],
+        "type": "object",
+        "properties": {
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "password": { "title": "Password", "type": "string" }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ValidationError" }
+          }
+        }
+      },
+      "ReadUserSchema": {
+        "title": "ReadUserSchema",
+        "required": ["id_", "email", "is_active"],
+        "type": "object",
+        "properties": {
+          "id_": { "title": "Id ", "type": "integer" },
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "is_active": { "title": "Is Active", "type": "boolean" }
+        }
+      },
+      "ResendVerificationRequestSchema": {
+        "title": "ResendVerificationRequestSchema",
+        "required": ["email"],
+        "type": "object",
+        "properties": {
+          "email": { "title": "Email", "type": "string", "format": "email" }
+        }
+      },
+      "TokenSchema": {
+        "title": "TokenSchema",
+        "required": ["access_token", "token_type"],
+        "type": "object",
+        "properties": {
+          "access_token": { "title": "Access Token", "type": "string" },
+          "token_type": { "title": "Token Type", "type": "string" }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "msg": { "title": "Message", "type": "string" },
+          "type": { "title": "Error Type", "type": "string" }
+        }
+      },
+      "VerifyTokenRequestSchema": {
+        "title": "VerifyTokenRequestSchema",
+        "required": ["token"],
+        "type": "object",
+        "properties": { "token": { "title": "Token", "type": "string" } }
+      }
+    }
+  }
+}

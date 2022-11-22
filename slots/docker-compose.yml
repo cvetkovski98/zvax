@@ -1,0 +1,18 @@
+version: "3.9"
+# redis docker service
+services:
+  redis:
+    image: bitnami/redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+      - REDIS_DB=0
+      - REDIS_MAXMEMORY=256mb
+
+volumes:
+  redis_data:

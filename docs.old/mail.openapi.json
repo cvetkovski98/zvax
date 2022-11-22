@@ -1,0 +1,110 @@
+{
+  "openapi": "3.0.2",
+  "info": { "title": "Zvax Mail Service", "version": "0.1.0" },
+  "servers": [{ "url": "/mail" }],
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "Send Mail",
+        "operationId": "send_mail__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmailSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailSchema": {
+        "title": "EmailSchema",
+        "required": ["subject", "sender_name", "recipients", "sender_email"],
+        "type": "object",
+        "properties": {
+          "subject": { "title": "Subject", "type": "string" },
+          "sender_name": { "title": "Sender Name", "type": "string" },
+          "recipients": {
+            "title": "Recipients",
+            "type": "array",
+            "items": { "type": "string", "format": "email" }
+          },
+          "sender_email": {
+            "title": "Sender Email",
+            "type": "string",
+            "format": "email"
+          },
+          "body": { "title": "Body", "type": "string" },
+          "template_body": {
+            "$ref": "#/components/schemas/VerifyEmailTemplateArgs"
+          },
+          "template_name": { "title": "Template Name", "type": "string" },
+          "attachments": {
+            "title": "Attachments",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "example": {
+          "subject": "Example email subject",
+          "sender_name": "Jogn doe",
+          "recipients": ["first@gmail.com", "second@gmail.com"],
+          "sender_email": "john@doe.com",
+          "template_body": { "url": "http://localhost" },
+          "attachments": [
+            "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"
+          ],
+          "template_name": "verify_email.html"
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ValidationError" }
+          }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "msg": { "title": "Message", "type": "string" },
+          "type": { "title": "Error Type", "type": "string" }
+        }
+      },
+      "VerifyEmailTemplateArgs": {
+        "title": "VerifyEmailTemplateArgs",
+        "required": ["url"],
+        "type": "object",
+        "properties": { "url": { "title": "Url", "type": "string" } }
+      }
+    }
+  }
+}

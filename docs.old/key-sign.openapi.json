@@ -1,0 +1,604 @@
+{
+  "openapi": "3.0.2",
+  "info": { "title": "Zvax Key & Sign Service", "version": "0.1.0" },
+  "servers": [{ "url": "/key-sign" }],
+  "paths": {
+    "/master_pubkey": {
+      "get": {
+        "tags": ["Key Management"],
+        "summary": "Fetch Master Pubkey",
+        "operationId": "fetch_master_pubkey_master_pubkey_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/doctors": {
+      "get": {
+        "tags": ["Key Management"],
+        "summary": "Fetch All",
+        "operationId": "fetch_all_doctors_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Email",
+              "type": "array",
+              "items": { "type": "string", "format": "email" }
+            },
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Fetch All Doctors Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DoctorSchema" }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/doctors/{email}": {
+      "get": {
+        "tags": ["Key Management"],
+        "summary": "Fetch One By Email",
+        "operationId": "fetch_one_by_email_doctors__email__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "title": "Email", "type": "string", "format": "email" },
+            "name": "email",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DoctorSchema" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/doctors/certify": {
+      "post": {
+        "tags": ["Key Management"],
+        "summary": "Sign Doctor Certificate",
+        "operationId": "sign_doctor_certificate_doctors_certify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DoctorSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/doctors/verify-cert": {
+      "post": {
+        "tags": ["Key Management"],
+        "summary": "Verify Zvax Certificate",
+        "operationId": "verify_zvax_certificate_doctors_verify_cert_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/sign/plf": {
+      "post": {
+        "tags": ["Signature Management"],
+        "summary": "Sign Passenger Locator Form",
+        "operationId": "sign_passenger_locator_form_sign_plf_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PLForm" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sign/eu-cert": {
+      "post": {
+        "tags": ["Signature Management"],
+        "summary": "Sign Eu Certificate",
+        "operationId": "sign_eu_certificate_sign_eu_cert_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EUCert" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sign/zvax-cert": {
+      "post": {
+        "tags": ["Signature Management"],
+        "summary": "Sign Zvax Appointment",
+        "operationId": "sign_zvax_appointment_sign_zvax_cert_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AppointmentQRContent" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sign/stored-certificates": {
+      "get": {
+        "tags": ["Signature Management"],
+        "summary": "Get Stored Certificate",
+        "operationId": "get_stored_certificate_sign_stored_certificates_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "title": "Email", "type": "string", "format": "email" },
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoredCertificateSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Signature Management"],
+        "summary": "Create Stored Certificate",
+        "operationId": "create_stored_certificate_sign_stored_certificates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoredCertificateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoredCertificateSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "mq/sign/plf": {
+      "post": {
+        "tags": ["MQ Signature Management"],
+        "summary": "Sign Passenger Locator Form",
+        "operationId": "sign_passenger_locator_formmq_sign_plf_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PLForm" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "mq/sign/eu-cert": {
+      "post": {
+        "tags": ["MQ Signature Management"],
+        "summary": "Sign Eu Certificate",
+        "operationId": "sign_eu_certificatemq_sign_eu_cert_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EUCert" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "mq/sign/zvax-cert": {
+      "post": {
+        "tags": ["MQ Signature Management"],
+        "summary": "Sign Zvax Appointment",
+        "operationId": "sign_zvax_appointmentmq_sign_zvax_cert_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AppointmentQRContent" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppointmentQRContent": {
+        "title": "AppointmentQRContent",
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "birth_date",
+          "language",
+          "street",
+          "zip_code",
+          "city",
+          "country",
+          "datetime_"
+        ],
+        "type": "object",
+        "properties": {
+          "first_name": { "title": "First Name", "type": "string" },
+          "last_name": { "title": "Last Name", "type": "string" },
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "birth_date": {
+            "title": "Birth Date",
+            "type": "string",
+            "format": "date"
+          },
+          "language": { "title": "Language", "type": "string" },
+          "street": { "title": "Street", "type": "string" },
+          "zip_code": { "title": "Zip Code", "type": "string" },
+          "city": { "title": "City", "type": "string" },
+          "country": { "title": "Country", "type": "string" },
+          "datetime_": {
+            "title": "Datetime ",
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DoctorSchema": {
+        "title": "DoctorSchema",
+        "type": "object",
+        "properties": {
+          "full_name": { "title": "The doctor's full name", "type": "string" },
+          "email": {
+            "title": "The doctor's email",
+            "type": "string",
+            "format": "email"
+          },
+          "institution": {
+            "title": "The doctor's institution",
+            "type": "string"
+          },
+          "pub_key": { "title": "The doctor's public key", "type": "string" }
+        }
+      },
+      "EUCert": {
+        "title": "EUCert",
+        "required": ["dob", "nam", "v"],
+        "type": "object",
+        "properties": {
+          "dob": { "title": "Dob", "type": "string" },
+          "nam": { "$ref": "#/components/schemas/EUCertName" },
+          "v": {
+            "title": "V",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/EUCertVaccination" }
+          }
+        }
+      },
+      "EUCertName": {
+        "title": "EUCertName",
+        "required": ["fn", "fnt", "gn", "gnt"],
+        "type": "object",
+        "properties": {
+          "fn": { "title": "Fn", "type": "string" },
+          "fnt": { "title": "Fnt", "type": "string" },
+          "gn": { "title": "Gn", "type": "string" },
+          "gnt": { "title": "Gnt", "type": "string" }
+        }
+      },
+      "EUCertVaccination": {
+        "title": "EUCertVaccination",
+        "required": [
+          "tg",
+          "vp",
+          "mp",
+          "ma",
+          "dn",
+          "sd",
+          "dt",
+          "co",
+          "is",
+          "ci"
+        ],
+        "type": "object",
+        "properties": {
+          "tg": { "title": "Tg", "type": "string" },
+          "vp": { "title": "Vp", "type": "string" },
+          "mp": { "title": "Mp", "type": "string" },
+          "ma": { "title": "Ma", "type": "string" },
+          "dn": { "title": "Dn", "type": "integer" },
+          "sd": { "title": "Sd", "type": "integer" },
+          "dt": { "title": "Dt", "type": "string" },
+          "co": { "title": "Co", "type": "string" },
+          "is": { "title": "Is", "type": "string" },
+          "ci": { "title": "Ci", "type": "string" }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ValidationError" }
+          }
+        }
+      },
+      "PLForm": {
+        "title": "PLForm",
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "date_arrival",
+          "country_origin",
+          "country_arrival"
+        ],
+        "type": "object",
+        "properties": {
+          "first_name": { "title": "First Name", "type": "string" },
+          "last_name": { "title": "Last Name", "type": "string" },
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "date_arrival": {
+            "title": "Date Arrival",
+            "type": "string",
+            "format": "date"
+          },
+          "country_origin": { "title": "Country Origin", "type": "string" },
+          "country_arrival": { "title": "Country Arrival", "type": "string" }
+        }
+      },
+      "SimpleContentResponse": {
+        "title": "SimpleContentResponse",
+        "required": ["content"],
+        "type": "object",
+        "properties": {
+          "content": {
+            "title": "Content",
+            "anyOf": [
+              { "type": "string" },
+              { "type": "string", "format": "binary" }
+            ]
+          }
+        }
+      },
+      "StoredCertificateSchema": {
+        "title": "StoredCertificateSchema",
+        "required": ["email", "certificate"],
+        "type": "object",
+        "properties": {
+          "email": { "title": "Email", "type": "string", "format": "email" },
+          "certificate": { "title": "Certificate", "type": "string" }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "msg": { "title": "Message", "type": "string" },
+          "type": { "title": "Error Type", "type": "string" }
+        }
+      }
+    }
+  }
+}

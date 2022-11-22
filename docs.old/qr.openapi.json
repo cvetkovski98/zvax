@@ -1,0 +1,113 @@
+{
+  "openapi": "3.0.2",
+  "info": { "title": "Zvax QR service", "version": "0.1.0" },
+  "servers": [{ "url": "/qr" }],
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "Create Qr",
+        "operationId": "create_qr__post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/Body_create_qr__post" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bulk": {
+      "post": {
+        "summary": "Create Qr Bulk",
+        "operationId": "create_qr_bulk_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BulkQRCodeRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_create_qr__post": {
+        "title": "Body_create_qr__post",
+        "required": ["content"],
+        "type": "object",
+        "properties": {
+          "content": { "title": "Content", "type": "string" },
+          "image": { "title": "Image", "type": "string", "format": "binary" }
+        }
+      },
+      "BulkQRCodeRequest": {
+        "title": "BulkQRCodeRequest",
+        "required": ["content"],
+        "type": "object",
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ValidationError" }
+          }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "msg": { "title": "Message", "type": "string" },
+          "type": { "title": "Error Type", "type": "string" }
+        }
+      }
+    }
+  }
+}
