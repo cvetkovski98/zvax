@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/uptrace/bun"
@@ -18,11 +17,6 @@ type User struct {
 
 	CreatedAt time.Time `bun:"created_at,nullzero,notnull,default:current_timestamp"`
 	UpdatedAt time.Time `bun:"updated_at,nullzero,notnull,default:current_timestamp"`
-}
-
-// string prints the user values in a nice format
-func (user *User) String() string {
-	return fmt.Sprintf("User{Id: %d, Email: %s, Name: %s, Password: %v, CreatedAt: %s, UpdatedAt: %s}", user.Id, user.Email, user.Name, user.Password, user.CreatedAt, user.UpdatedAt)
 }
 
 type Role struct {
