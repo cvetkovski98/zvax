@@ -12,16 +12,16 @@ type pg struct {
 	db *bun.DB
 }
 
-func (repository *pg) InsertOne(ctx context.Context, user *model.User) (*model.User, error) {
-	if _, err := repository.db.NewInsert().Model(user).Exec(ctx); err != nil {
+func (r *pg) InsertOne(ctx context.Context, user *model.User) (*model.User, error) {
+	if _, err := r.db.NewInsert().Model(user).Exec(ctx); err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (repository *pg) FindOneByEmail(ctx context.Context, email string) (*model.User, error) {
+func (r *pg) FindOneByEmail(ctx context.Context, email string) (*model.User, error) {
 	var user = new(model.User)
-	var query = repository.db.NewSelect().Model(user).Where("email = ?", email)
+	var query = r.db.NewSelect().Model(user).Where("email = ?", email)
 	if err := query.Scan(ctx); err != nil {
 		return nil, err
 	}
