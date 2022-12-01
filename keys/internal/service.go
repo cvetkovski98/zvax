@@ -1,13 +1,13 @@
-package internal
+package keys
 
 import (
 	"context"
-	"github.com/cvetkovski98/zvax-keys/internal/model"
-	"github.com/cvetkovski98/zvax-keys/internal/model/dto"
+
+	"github.com/cvetkovski98/zvax-keys/internal/dto"
 )
 
-type KeyService interface {
-	RegisterKey(ctx context.Context, key *dto.RegisterKeyInDto) (*model.Key, *string, error)
-	ListKeys(ctx context.Context) ([]*model.Key, error)
-	GetKey(ctx context.Context, keyId int64) (*model.Key, error)
+type Service interface {
+	RegisterKey(ctx context.Context, key *dto.RegisterKey) (*dto.Key, string, error)
+	ListKeys(ctx context.Context, holder string) (*dto.Keys, error)
+	GetKey(ctx context.Context, id int) (*dto.Key, error)
 }

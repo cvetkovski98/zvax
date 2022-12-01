@@ -1,38 +1,25 @@
 package postgresql
 
 import (
-	"context"
-	"time"
+	"database/sql"
+	"log"
 
-	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/pkg/errors"
+	"github.com/cvetkovski98/zvax-keys/internal/config"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
-const (
-	healthCheckPeriod = 3 * time.Minute
-	maxConnIdleTime   = 1 * time.Minute
-	maxConnLifetime   = 3 * time.Minute
-	minConn           = 10
-	lazyConnect       = false
-)
-
-func NewPgxConn(connString string) (*pgxpool.Pool, error) {
-	ctx := context.Background()
-
-	poolCfg, err := pgxpool.ParseConfig(connString)
-	if err != nil {
+func NewPgDb(c *config.DbConfig, pc *config.PoolConfig) (*bun.DB, error) {
+	log.Println("Connecting to PostgreSQL database...")
+	var connector = pgdriver.NewConnector(pgdriver.WithDSN(c.Dsn()))
+	var db = sql.OpenDB(connector)
+	db.SetMaxOpenConns(pc.MaxConn)
+	db.SetMaxIdleConns(pc.MinConn)
+	db.SetConnMaxIdleTime(pc.MaxConnIdleTime)
+	db.SetConnMaxLifetime(pc.MaxConnLifetime)
+	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-
-	poolCfg.HealthCheckPeriod = healthCheckPeriod
-	poolCfg.MaxConnIdleTime = maxConnIdleTime
-	poolCfg.MaxConnLifetime = maxConnLifetime
-	poolCfg.MinConns = minConn
-	poolCfg.LazyConnect = lazyConnect
-	connPool, err := pgxpool.ConnectConfig(ctx, poolCfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "pgxpool.ConnectConfig")
-	}
-
-	return connPool, nil
+	return bun.NewDB(db, pgdialect.New()), nil
 }

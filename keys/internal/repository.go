@@ -1,4 +1,4 @@
-package internal
+package keys
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"github.com/cvetkovski98/zvax-keys/internal/model"
 )
 
-type KeyRepository interface {
+type Repository interface {
 	InsertOne(ctx context.Context, key *model.Key) (*model.Key, error)
-	FindAll(ctx context.Context) ([]*model.Key, error)
-	FindOneById(ctx context.Context, keyId int64) (*model.Key, error)
+	FindAllByHolder(ctx context.Context, holder string) ([]*model.Key, error)
+	FindOneById(ctx context.Context, id int) (*model.Key, error)
 }

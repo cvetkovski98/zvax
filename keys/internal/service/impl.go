@@ -11,20 +11,20 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/cvetkovski98/zvax-keys/internal"
-	"github.com/cvetkovski98/zvax-keys/internal/model"
-	"github.com/cvetkovski98/zvax-keys/internal/model/dto"
+	keys "github.com/cvetkovski98/zvax-keys/internal"
+	"github.com/cvetkovski98/zvax-keys/internal/dto"
+	"github.com/cvetkovski98/zvax-keys/internal/mapper"
 	"github.com/cvetkovski98/zvax-keys/internal/utils"
 	"github.com/pkg/errors"
 )
 
-type keyServiceImpl struct {
-	keyRepository internal.KeyRepository
+type impl struct {
+	kr keys.Repository
 }
 
 // signCertificate generates a signed certificate for a template using the CA Certificate and CA Private Key.
 // returns the bytes of the PEM-encoded certificate.
-func (service *keyServiceImpl) signCertificate(template *x509.Certificate) ([]byte, error) {
+func (s *impl) signCertificate(template *x509.Certificate) ([]byte, error) {
 	rootKey, err := utils.LoadCaKey()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load ca key")
@@ -50,14 +50,14 @@ func (service *keyServiceImpl) signCertificate(template *x509.Certificate) ([]by
 	return pemBytes, nil
 }
 
-func (service *keyServiceImpl) RegisterKey(ctx context.Context, key *dto.RegisterKeyInDto) (*model.Key, *string, error) {
-	publicKey, err := utils.ParseBase64PublicKey(key.PublicKey)
+func (s *impl) RegisterKey(ctx context.Context, key *dto.RegisterKey) (*dto.Key, string, error) {
+	publicKey, err := utils.ParseBase64PublicKey(key.Value)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to parse base64 into public key")
+		return nil, "", errors.Wrap(err, "failed to parse base64 into public key")
 	}
 	serialNumber, err := rand.Int(rand.Reader, big.NewInt(1<<32))
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to generate serial number")
+		return nil, "", errors.Wrap(err, "failed to generate serial number")
 	}
 	emailAddressOid := asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 9, 1}
 	cert := x509.Certificate{
@@ -76,33 +76,38 @@ func (service *keyServiceImpl) RegisterKey(ctx context.Context, key *dto.Registe
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		IsCA:        false,
 	}
-	certPemBytes, err := service.signCertificate(&cert)
+	certPemBytes, err := s.signCertificate(&cert)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to create certificate")
+		return nil, "", errors.Wrap(err, "failed to create certificate")
 	}
 	certBase64 := base64.StdEncoding.EncodeToString(certPemBytes)
-	keyIn := &model.Key{
-		Holder:      key.Holder,
-		Affiliation: key.Affiliation,
-		Value:       key.PublicKey,
-	}
-	created, err := service.keyRepository.InsertOne(ctx, keyIn)
+	keyModel := mapper.RegisterKeyDtoToModel(key)
+	created, err := s.kr.InsertOne(ctx, keyModel)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to insert key")
+		return nil, "", errors.Wrap(err, "failed to insert key")
 	}
-	return created, &certBase64, err
+	return mapper.KeyModelToDto(created), certBase64, nil
 }
 
-func (service *keyServiceImpl) ListKeys(ctx context.Context) ([]*model.Key, error) {
-	return service.keyRepository.FindAll(ctx)
+func (s *impl) ListKeys(ctx context.Context, holder string) (*dto.Keys, error) {
+	keys, err := s.kr.FindAllByHolder(ctx, holder)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to find keys")
+	}
+	return mapper.KeysModelToDto(keys), nil
+
 }
 
-func (service *keyServiceImpl) GetKey(ctx context.Context, keyId int64) (*model.Key, error) {
-	return service.keyRepository.FindOneById(ctx, keyId)
+func (s *impl) GetKey(ctx context.Context, id int) (*dto.Key, error) {
+	key, err := s.kr.FindOneById(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to find key")
+	}
+	return mapper.KeyModelToDto(key), nil
 }
 
-func NewKeyServiceImpl(userRepository internal.KeyRepository) internal.KeyService {
-	return &keyServiceImpl{
-		keyRepository: userRepository,
+func NewKeyServiceImpl(userRepository keys.Repository) keys.Service {
+	return &impl{
+		kr: userRepository,
 	}
 }
