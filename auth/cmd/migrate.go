@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/cvetkovski98/zvax-auth/pkg/config"
+	"github.com/cvetkovski98/zvax-auth/internal/config"
 	"github.com/cvetkovski98/zvax-auth/pkg/postgresql"
 	"github.com/spf13/cobra"
 )

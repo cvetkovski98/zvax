@@ -4,10 +4,10 @@ import (
 	"log"
 	"net"
 
+	"github.com/cvetkovski98/zvax-auth/internal/config"
 	"github.com/cvetkovski98/zvax-auth/internal/delivery"
 	"github.com/cvetkovski98/zvax-auth/internal/repository"
 	"github.com/cvetkovski98/zvax-auth/internal/service"
-	"github.com/cvetkovski98/zvax-auth/pkg/config"
 	"github.com/cvetkovski98/zvax-auth/pkg/postgresql"
 	"github.com/cvetkovski98/zvax-common/gen/pbauth"
 	"github.com/spf13/cobra"
