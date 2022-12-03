@@ -3,14 +3,13 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-zvax}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
+      - ./initdb.d:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
 
 volumes:
-    postgres:
+  postgres:
