@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-auth}
+      POSTGRES_DB: ${POSTGRES_DB:-zvax}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       PGDATA: /data/postgres
