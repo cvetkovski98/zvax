@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/cvetkovski98/zvax-keys/internal/config"
 	"github.com/uptrace/bun"
@@ -11,7 +10,6 @@ import (
 )
 
 func NewPgDb(c *config.DbConfig, pc *config.PoolConfig) (*bun.DB, error) {
-	log.Println("Connecting to PostgreSQL database...")
 	var connector = pgdriver.NewConnector(pgdriver.WithDSN(c.Dsn()))
 	var db = sql.OpenDB(connector)
 	db.SetMaxOpenConns(pc.MaxConn)

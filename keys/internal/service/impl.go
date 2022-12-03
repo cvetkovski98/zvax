@@ -14,7 +14,8 @@ import (
 	keys "github.com/cvetkovski98/zvax-keys/internal"
 	"github.com/cvetkovski98/zvax-keys/internal/dto"
 	"github.com/cvetkovski98/zvax-keys/internal/mapper"
-	"github.com/cvetkovski98/zvax-keys/internal/utils"
+	cautils "github.com/cvetkovski98/zvax-keys/internal/utils/ca"
+	rsautils "github.com/cvetkovski98/zvax-keys/internal/utils/rsa"
 	"github.com/pkg/errors"
 )
 
@@ -25,11 +26,11 @@ type impl struct {
 // signCertificate generates a signed certificate for a template using the CA Certificate and CA Private Key.
 // returns the bytes of the PEM-encoded certificate.
 func (s *impl) signCertificate(template *x509.Certificate) ([]byte, error) {
-	rootKey, err := utils.LoadCaKey()
+	rootKey, err := cautils.LoadCaKey()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load ca key")
 	}
-	rootCert, err := utils.LoadCaCert()
+	rootCert, err := cautils.LoadCaCert()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load ca cert")
 	}
@@ -51,7 +52,7 @@ func (s *impl) signCertificate(template *x509.Certificate) ([]byte, error) {
 }
 
 func (s *impl) RegisterKey(ctx context.Context, key *dto.RegisterKey) (*dto.Key, string, error) {
-	publicKey, err := utils.ParseBase64PublicKey(key.Value)
+	publicKey, err := rsautils.PublicKeyFromBase64(key.Value)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to parse base64 into public key")
 	}

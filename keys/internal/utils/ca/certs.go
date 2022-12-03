@@ -1,4 +1,4 @@
-package utils
+package cautils
 
 const CaPrivateKeyPem = `-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAgtDYH8fy/+I53wHRbnRJ92CqmsGUvLljntLhJAXaYUm2ZstB

@@ -4,7 +4,7 @@ db:
   port: 5432
   user: postgres
   pass: changeme
-  name: auth
+  name: keystest
   pool:
     max_conn: 16
     min_conn: 4
