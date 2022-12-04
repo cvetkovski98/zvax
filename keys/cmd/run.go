@@ -17,8 +17,8 @@ import (
 var (
 	runCommand = &cobra.Command{
 		Use:   "run",
-		Short: "Run auth microservice",
-		Long:  `Run auth microservice`,
+		Short: "Run keys microservice",
+		Long:  `Run keys microservice`,
 		Run:   run,
 	}
 	network string

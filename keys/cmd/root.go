@@ -8,10 +8,10 @@ import (
 )
 
 var root = &cobra.Command{
-	Short: "Auth microservice",
-	Long:  `Auth microservice`,
+	Short: "Keys microservice",
+	Long:  `Keys microservice`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Auth microservice")
+		fmt.Println("Keys microservice")
 	},
 }
 
