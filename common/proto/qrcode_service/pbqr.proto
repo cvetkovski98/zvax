@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package = "github.com/cvetkovski98/zvax-common/gen/pbqr";
+
+package pbqr;
+
+service QR {
+    rpc GenerateQR (QRRequest) returns (QRResponse) {}
+}
+
+message QRRequest {
+    string content = 1;
+}
+
+message QRResponse {
+    bytes qr = 1;
+}
