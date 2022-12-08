@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"context"
+	context "context"
 
 	"github.com/cvetkovski98/zvax-common/gen/pbqr"
 	qrcode "github.com/cvetkovski98/zvax/zvax-qrcode/internal"
@@ -10,21 +10,32 @@ import (
 type server struct {
 	s qrcode.Service
 
-	pbqr.UnimplementedQRServer
+	pbqr.UnimplementedQRCodeServer
 }
 
-func (s *server) GenerateQR(ctx context.Context, request *pbqr.QRRequest) (*pbqr.QRResponse, error) {
-	content, err := s.s.Generate(request.Content)
+func (s *server) CreateQRCode(ctx context.Context, request *pbqr.CreateQRCodeRequest) (*pbqr.QRCodeResponse, error) {
+	in := CreateQRCodeRequestToDto(request)
+	out, err := s.s.CreateQRCode(ctx, in)
 	if err != nil {
 		return nil, err
 	}
-	response := &pbqr.QRResponse{
-		Qr: content,
-	}
-	return response, nil
+	return &pbqr.QRCodeResponse{
+		Qr: out.Content,
+	}, nil
 }
 
-func NewQRServer(s qrcode.Service) pbqr.QRServer {
+func (s *server) GetQRCode(ctx context.Context, request *pbqr.GetQRCodeRequest) (*pbqr.QRCodeResponse, error) {
+	in := GetQRCodeRequestToDto(request)
+	out, err := s.s.GetQRCode(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return &pbqr.QRCodeResponse{
+		Qr: out.Content,
+	}, nil
+}
+
+func NewQRCodeServer(s qrcode.Service) pbqr.QRCodeServer {
 	return &server{
 		s: s,
 	}

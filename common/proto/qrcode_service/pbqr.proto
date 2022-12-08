@@ -3,14 +3,26 @@ option go_package = "github.com/cvetkovski98/zvax-common/gen/pbqr";
 
 package pbqr;
 
-service QR {
-    rpc GenerateQR (QRRequest) returns (QRResponse) {}
+service QRCode {
+    rpc CreateQRCode (CreateQRCodeRequest) returns (QRCodeResponse) {}
+    rpc GetQRCode (GetQRCodeRequest) returns (QRCodeResponse) {}
 }
 
-message QRRequest {
-    string content = 1;
+message CreateQRCodeRequest {
+    optional string email = 1;
+    string content = 2;
+    bool store = 3;
 }
 
-message QRResponse {
+message CreateQRCodeResponse {
+    optional string email = 1;
+    bytes qr = 2;
+}
+
+message GetQRCodeRequest {
+    string email = 1;
+}
+
+message QRCodeResponse {
     bytes qr = 1;
 }

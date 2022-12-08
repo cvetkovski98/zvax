@@ -5,8 +5,11 @@ import (
 	"net"
 
 	"github.com/cvetkovski98/zvax-common/gen/pbqr"
+	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/config"
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/delivery"
+	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/repository"
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/service"
+	"github.com/cvetkovski98/zvax/zvax-qrcode/pkg/postgresql"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -33,10 +36,16 @@ func run(cmd *cobra.Command, args []string) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	log.Printf("Listening on %s://%s...", network, address)
-	qrService := service.NewQRCodeService()
-	qrGrpc := delivery.NewQRServer(qrService)
+	cfg := config.GetConfig()
+	db, err := postgresql.NewPgDb(&cfg.Db, &cfg.Pool)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	qrRepository := repository.NewPgQRCodeRepository(db)
+	qrService := service.NewQRCodeService(qrRepository)
+	qrGrpc := delivery.NewQRCodeServer(qrService)
 	server := grpc.NewServer()
-	pbqr.RegisterQRServer(server, qrGrpc)
+	pbqr.RegisterQRCodeServer(server, qrGrpc)
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

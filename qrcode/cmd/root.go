@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +16,15 @@ var root = &cobra.Command{
 }
 
 func init() {
+	cobra.OnInitialize(configure)
 	root.AddCommand(runCommand)
+	root.AddCommand(migrateCommand)
+}
+
+func configure() {
+	if err := config.LoadConfig("config.dev.yaml"); err != nil {
+		panic(err)
+	}
 }
 
 func Execute() error {
