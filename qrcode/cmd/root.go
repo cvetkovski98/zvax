@@ -19,6 +19,7 @@ func init() {
 	cobra.OnInitialize(configure)
 	root.AddCommand(runCommand)
 	root.AddCommand(migrateCommand)
+	root.AddCommand(createBucketCommand)
 }
 
 func configure() {

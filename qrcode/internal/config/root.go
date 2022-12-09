@@ -5,8 +5,9 @@ import (
 )
 
 type Config struct {
-	Db   DbConfig   `mapstructure:"db"`
-	Pool PoolConfig `mapstructure:"db.pool"`
+	Db    DbConfig    `mapstructure:"db"`
+	Pool  PoolConfig  `mapstructure:"db.pool"`
+	Minio MinIOConfig `mapstructure:"minio"`
 }
 
 func LoadConfig(name string) error {
