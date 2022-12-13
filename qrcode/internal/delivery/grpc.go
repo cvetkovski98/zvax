@@ -19,9 +19,7 @@ func (s *server) CreateQRCode(ctx context.Context, request *pbqr.CreateQRCodeReq
 	if err != nil {
 		return nil, err
 	}
-	return &pbqr.QRCodeResponse{
-		Qr: out.Content,
-	}, nil
+	return QRCodeDtoToResponse(out), nil
 }
 
 func (s *server) GetQRCode(ctx context.Context, request *pbqr.GetQRCodeRequest) (*pbqr.QRCodeResponse, error) {
@@ -30,9 +28,7 @@ func (s *server) GetQRCode(ctx context.Context, request *pbqr.GetQRCodeRequest) 
 	if err != nil {
 		return nil, err
 	}
-	return &pbqr.QRCodeResponse{
-		Qr: out.Content,
-	}, nil
+	return QRCodeDtoToResponse(out), nil
 }
 
 func NewQRCodeServer(s qrcode.Service) pbqr.QRCodeServer {

@@ -5,7 +5,7 @@ import "time"
 type CreateQRCode struct {
 	Email   *string
 	Content string
-	Store   bool
+	Stored  bool
 }
 
 type GetQRCode struct {
@@ -13,13 +13,10 @@ type GetQRCode struct {
 }
 
 type QR struct {
-	Content []byte
-}
-
-type StoredQR struct {
-	ID        int
-	Email     string
 	Content   []byte
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Stored    bool
+	Email     *string
+	Location  *string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 }

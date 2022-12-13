@@ -9,6 +9,7 @@ import (
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/delivery"
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/repository"
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/service"
+	"github.com/cvetkovski98/zvax/zvax-qrcode/pkg/minio"
 	"github.com/cvetkovski98/zvax/zvax-qrcode/pkg/postgresql"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -41,8 +42,14 @@ func run(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
+	defer db.Close()
+	minIOClient, err := minio.NewMinioClient(&cfg.Minio)
+	if err != nil {
+		log.Fatalf("failed to connect to minio: %v", err)
+	}
 	qrRepository := repository.NewPgQRCodeRepository(db)
-	qrService := service.NewQRCodeService(qrRepository)
+	qrObjStore := repository.NewMinioObjectStore(minIOClient)
+	qrService := service.NewQRCodeService(qrRepository, qrObjStore)
 	qrGrpc := delivery.NewQRCodeServer(qrService)
 	server := grpc.NewServer()
 	pbqr.RegisterQRCodeServer(server, qrGrpc)

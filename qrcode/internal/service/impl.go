@@ -12,14 +12,17 @@ import (
 	qrutil "github.com/cvetkovski98/zvax/zvax-qrcode/internal/utils/qr"
 )
 
+const bucket = "qrcodes"
+
 type impl struct {
-	r qrcode.Repository
+	r  qrcode.Repository
+	os qrcode.ObjectStore
 }
 
 func (s *impl) validateCreateQRCode(ctx context.Context, request *dto.CreateQRCode) error {
 	emailEmpty := request.Email == nil || *request.Email == ""
 
-	if request.Store && emailEmpty {
+	if request.Stored && emailEmpty {
 		return errors.New("email is required when storing QR code")
 	}
 
@@ -40,38 +43,49 @@ func (s *impl) CreateQRCode(ctx context.Context, request *dto.CreateQRCode) (*dt
 	if err := s.validateCreateQRCode(ctx, request); err != nil {
 		return nil, err
 	}
-
 	content, err := qrutil.GenerateQRCode(request.Content)
 	if err != nil {
 		return nil, err
 	}
-
-	result := &dto.QR{
-		Content: content,
+	if !request.Stored {
+		return mapper.QRDtoFromContent(content), nil
 	}
 
-	if request.Store {
-		QRin := &model.QR{
-			Email:   *request.Email,
-			Content: content,
-		}
-		_, err := s.r.InsertOne(ctx, QRin)
-		if err != nil {
-			return nil, err
-		}
+	objectName, err := s.os.UploadQR(ctx, bucket, *request.Email, content)
+	if err != nil {
+		return nil, err
 	}
-
-	return result, nil
+	url, err := s.os.GetResourceLocation(ctx, bucket, objectName)
+	if err != nil {
+		go s.os.RemoveQR(ctx, bucket, *request.Email)
+		return nil, err
+	}
+	QRin := &model.QR{
+		Email: request.Email,
+	}
+	_, err = s.r.InsertOne(ctx, QRin)
+	if err != nil {
+		go s.os.RemoveQR(ctx, bucket, *request.Email)
+		return nil, err
+	}
+	return mapper.QRDtoFromModel(QRin, url), nil
 }
 
-func (s *impl) GetQRCode(ctx context.Context, request *dto.GetQRCode) (*dto.StoredQR, error) {
+func (s *impl) GetQRCode(ctx context.Context, request *dto.GetQRCode) (*dto.QR, error) {
 	result, err := s.r.FindOneByEmail(ctx, request.Email)
 	if err != nil {
 		return nil, err
 	}
-	return mapper.QRModelToDto(result), nil
+	url, err := s.os.GetResourceLocation(ctx, bucket, request.Email)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.QRDtoFromModel(result, url), nil
 }
 
-func NewQRCodeService(r qrcode.Repository) qrcode.Service {
-	return &impl{r: r}
+func NewQRCodeService(r qrcode.Repository, os qrcode.ObjectStore) qrcode.Service {
+	return &impl{
+		r:  r,
+		os: os,
+	}
 }

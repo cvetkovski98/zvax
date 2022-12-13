@@ -8,5 +8,5 @@ import (
 
 type Service interface {
 	CreateQRCode(context.Context, *dto.CreateQRCode) (*dto.QR, error)
-	GetQRCode(context.Context, *dto.GetQRCode) (*dto.StoredQR, error)
+	GetQRCode(context.Context, *dto.GetQRCode) (*dto.QR, error)
 }

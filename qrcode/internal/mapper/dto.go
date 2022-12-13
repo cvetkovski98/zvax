@@ -1,16 +1,28 @@
 package mapper
 
 import (
+	"net/url"
+
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/dto"
 	"github.com/cvetkovski98/zvax/zvax-qrcode/internal/model"
 )
 
-func QRModelToDto(qr *model.QR) *dto.StoredQR {
-	return &dto.StoredQR{
-		ID:        qr.ID,
+func QRDtoFromContent(content []byte) *dto.QR {
+	return &dto.QR{
+		Content: content,
+		Stored:  false,
+	}
+}
+
+func QRDtoFromModel(qr *model.QR, location *url.URL) *dto.QR {
+	location.RawQuery = ""
+	l := location.String()
+	return &dto.QR{
+		Content:   nil,
+		Stored:    true,
+		Location:  &l,
 		Email:     qr.Email,
-		Content:   qr.Content,
-		CreatedAt: qr.CreatedAt,
-		UpdatedAt: qr.UpdatedAt,
+		CreatedAt: &qr.CreatedAt,
+		UpdatedAt: &qr.UpdatedAt,
 	}
 }

@@ -1,6 +1,8 @@
 syntax = "proto3";
 option go_package = "github.com/cvetkovski98/zvax-common/gen/pbqr";
 
+import "google/protobuf/timestamp.proto";
+
 package pbqr;
 
 service QRCode {
@@ -11,12 +13,7 @@ service QRCode {
 message CreateQRCodeRequest {
     optional string email = 1;
     string content = 2;
-    bool store = 3;
-}
-
-message CreateQRCodeResponse {
-    optional string email = 1;
-    bytes qr = 2;
+    bool stored = 3;
 }
 
 message GetQRCodeRequest {
@@ -25,4 +22,9 @@ message GetQRCodeRequest {
 
 message QRCodeResponse {
     bytes qr = 1;
+    bool stored = 2;
+    optional string email = 3;
+    optional string location = 4;
+    optional google.protobuf.Timestamp created_at = 5;
+    optional google.protobuf.Timestamp updated_at = 6;
 }
