@@ -3,54 +3,70 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/cvetkovski98/zvax-slots/internal"
-	"github.com/cvetkovski98/zvax-slots/internal/model"
+	"log"
+
+	slots "github.com/cvetkovski98/zvax-slots/internal"
+	"github.com/cvetkovski98/zvax-slots/internal/crypto"
+	"github.com/cvetkovski98/zvax-slots/internal/dto"
+	"github.com/cvetkovski98/zvax-slots/internal/mapper"
 	"github.com/pkg/errors"
 )
 
 type SlotServiceImpl struct {
-	slotRepository internal.SlotRepository
+	r slots.Repository
 }
 
-func (service *SlotServiceImpl) GetSlotsAtLocationBetween(ctx context.Context, page *model.PageRequest) (*model.Page[model.Slot], error) {
-	slots, err := service.slotRepository.FindAllWithDateTimeBetween(ctx, page.StartDate, page.EndDate)
+func (s *SlotServiceImpl) GetSlotsAtLocationBetween(ctx context.Context, page *dto.SlotListRequest) (*dto.Page[dto.Slot], error) {
+	slots, err := s.r.FindAllWithDateTimeBetween(ctx, page.StartDate, page.EndDate)
 	if err != nil {
 		return nil, err
 	}
-	return &model.Page[model.Slot]{
-		Items: slots,
+	items := make([]*dto.Slot, len(slots))
+	for i, slot := range slots {
+		items[i] = &dto.Slot{
+			SlotID:    slot.SlotID,
+			Location:  slot.Location,
+			DateTime:  slot.DateTime,
+			Available: slot.Available,
+		}
+	}
+	return &dto.Page[dto.Slot]{
+		Items: items,
 	}, nil
 }
 
-func (service *SlotServiceImpl) CreateSlot(ctx context.Context, slot *model.Slot) (*model.Slot, error) {
-	if slot.SlotID != nil {
-		return nil, errors.New("slot id must be nil")
-	}
-	return service.slotRepository.InsertOne(ctx, slot)
-}
-
-func (service *SlotServiceImpl) CreateReservation(ctx context.Context, slotId string) (*model.Reservation, error) {
-	reservation, err := service.slotRepository.ReserveOneByKey(ctx, slotId)
+func (s *SlotServiceImpl) CreateSlot(ctx context.Context, slot *dto.CreateSlotRequest) (*dto.Slot, error) {
+	slotModel := mapper.CreateSlotDtoToModel(slot)
+	createdSlot, err := s.r.InsertOne(ctx, slotModel)
 	if err != nil {
 		return nil, err
 	}
-	return reservation, nil
+	return mapper.SlotModelToDto(createdSlot), nil
 }
 
-func (service *SlotServiceImpl) ConfirmReservation(ctx context.Context, reservationId string) (string, error) {
-	reservation, err := service.slotRepository.ConfirmOneByReservationId(ctx, reservationId)
+func (s *SlotServiceImpl) CreateReservation(ctx context.Context, slotID string) (*dto.Reservation, error) {
+	reservation, err := s.r.ReserveOneByKey(ctx, slotID)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.ReservationModelToDto(reservation), nil
+}
+
+func (s *SlotServiceImpl) ConfirmReservation(ctx context.Context, reservationID string) (string, error) {
+	confirmed, err := s.r.ConfirmOneByReservationID(ctx, reservationID)
+	log.Println(confirmed)
 	if err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf(
 			"error confirming reservation with id=%s",
-			*reservation.ReservationID,
+			confirmed.ReservationID,
 		))
 	}
-	// TODO: generate reservation token
-	return *reservation.ReservationID, nil
+	d := mapper.ReservationModelToDto(confirmed)
+	return crypto.SignReservation(d)
 }
 
-func NewSlotServiceImpl(slotRepository internal.SlotRepository) internal.SlotService {
+func NewSlotServiceImpl(slotRepository slots.Repository) slots.Service {
 	return &SlotServiceImpl{
-		slotRepository: slotRepository,
+		r: slotRepository,
 	}
 }

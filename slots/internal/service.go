@@ -1,13 +1,14 @@
-package internal
+package slots
 
 import (
 	"context"
-	"github.com/cvetkovski98/zvax-slots/internal/model"
+
+	"github.com/cvetkovski98/zvax-slots/internal/dto"
 )
 
-type SlotService interface {
-	GetSlotsAtLocationBetween(ctx context.Context, page *model.PageRequest) (*model.Page[model.Slot], error)
-	CreateSlot(ctx context.Context, slot *model.Slot) (*model.Slot, error)
-	CreateReservation(ctx context.Context, slotId string) (*model.Reservation, error)
-	ConfirmReservation(ctx context.Context, reservationId string) (string, error)
+type Service interface {
+	GetSlotsAtLocationBetween(ctx context.Context, page *dto.SlotListRequest) (*dto.Page[dto.Slot], error)
+	CreateSlot(ctx context.Context, slot *dto.CreateSlotRequest) (*dto.Slot, error)
+	CreateReservation(ctx context.Context, slotID string) (*dto.Reservation, error)
+	ConfirmReservation(ctx context.Context, reservationID string) (string, error)
 }

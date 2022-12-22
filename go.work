@@ -5,5 +5,4 @@ use (
 	./keys
 	./qrcode
 	./slots
-	./users
 )

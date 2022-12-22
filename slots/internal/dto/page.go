@@ -1,18 +1,18 @@
-package model
+package dto
 
 import (
 	"time"
 )
 
-type Model interface {
+type DTO interface {
 	Slot
 }
 
-type Page[T Model] struct {
+type Page[T DTO] struct {
 	Items []*T
 }
 
-type PageRequest struct {
+type SlotListRequest struct {
 	StartDate time.Time
 	EndDate   time.Time
 	Location  string

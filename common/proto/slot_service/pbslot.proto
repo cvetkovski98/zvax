@@ -2,7 +2,6 @@ syntax = "proto3";
 option go_package = "github.com/cvetkovski98/zvax-common/gen/pbslot";
 
 import "google/protobuf/timestamp.proto";
-import "user_service/pbuser.proto";
 
 package pbslot;
 
@@ -28,7 +27,7 @@ message SlotReservationRequest {
 
 message SlotReservationResponse {
   string reservation_id = 1;
-  google.protobuf.Timestamp valid_until = 3;
+  google.protobuf.Timestamp valid_until = 2;
 }
 
 message SlotConfirmationRequest {
@@ -36,9 +35,7 @@ message SlotConfirmationRequest {
 }
 
 message SlotConfirmationResponse {
-  pbuser.UserResponse user = 1;
-  SlotResponse slot = 2;
-  string slot_confirmation_token = 3;
+  string slot_confirmation_token = 1;
 }
 
 message SlotResponse {

@@ -2,59 +2,53 @@ package delivery
 
 import (
 	"context"
+	"log"
+
 	"github.com/cvetkovski98/zvax-common/gen/pbslot"
-	"github.com/cvetkovski98/zvax-slots/internal"
-	"github.com/cvetkovski98/zvax-slots/internal/mappers"
+	slots "github.com/cvetkovski98/zvax-slots/internal"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type SlotGrpcServerImpl struct {
 	pbslot.UnimplementedSlotGrpcServer
-	slotService internal.SlotService
+
+	s slots.Service
 }
 
-func (s SlotGrpcServerImpl) GetSlotList(
-	ctx context.Context,
-	request *pbslot.SlotListRequest,
-) (*pbslot.SlotListResponse, error) {
-	pageRequest, err := mappers.NewPageRequestFromSlotListRequest(request)
+func (s SlotGrpcServerImpl) GetSlotList(ctx context.Context, request *pbslot.SlotListRequest) (*pbslot.SlotListResponse, error) {
+	pageRequest, err := SlotListRequestToDto(request)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
-	payload, err := s.slotService.GetSlotsAtLocationBetween(ctx, pageRequest)
+	payload, err := s.s.GetSlotsAtLocationBetween(ctx, pageRequest)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get slots: %v", err)
 	}
-	return mappers.NewSlotListResponseFromPageResponse(*payload), nil
+	return SlotPageToResponse(payload), nil
 }
 
-func (s SlotGrpcServerImpl) CreateSlotReservation(
-	ctx context.Context,
-	request *pbslot.SlotReservationRequest,
-) (*pbslot.SlotReservationResponse, error) {
-	reservation, err := s.slotService.CreateReservation(ctx, request.SlotId)
+func (s SlotGrpcServerImpl) CreateSlotReservation(ctx context.Context, request *pbslot.SlotReservationRequest) (*pbslot.SlotReservationResponse, error) {
+	reservation, err := s.s.CreateReservation(ctx, request.SlotId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create slot: %v", err)
 	}
-	return mappers.NewSlotReservationResponseFromReservation(*reservation), nil
+	return ReservationDtoToResponse(reservation), nil
 }
 
-func (s SlotGrpcServerImpl) ConfirmSlotReservation(
-	ctx context.Context,
-	request *pbslot.SlotConfirmationRequest,
-) (*pbslot.SlotConfirmationResponse, error) {
-	token, err := s.slotService.ConfirmReservation(ctx, request.ReservationId)
+func (s SlotGrpcServerImpl) ConfirmSlotReservation(ctx context.Context, request *pbslot.SlotConfirmationRequest) (*pbslot.SlotConfirmationResponse, error) {
+	token, err := s.s.ConfirmReservation(ctx, request.ReservationId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to confirm slot: %v", err)
 	}
+	log.Println("token: ", token)
 	return &pbslot.SlotConfirmationResponse{
 		SlotConfirmationToken: token,
 	}, nil
 }
 
-func NewSlotGrpcServerImpl(slotService internal.SlotService) pbslot.SlotGrpcServer {
+func NewSlotGrpcServerImpl(s slots.Service) pbslot.SlotGrpcServer {
 	return &SlotGrpcServerImpl{
-		slotService: slotService,
+		s: s,
 	}
 }

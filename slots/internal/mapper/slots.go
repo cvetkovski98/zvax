@@ -1,9 +1,10 @@
-package mappers
+package mapper
 
 import (
+	"time"
+
 	"github.com/cvetkovski98/zvax-common/gen/pbslot"
 	"github.com/cvetkovski98/zvax-slots/internal/model"
-	"time"
 )
 
 func NewSlotResponseFromSlot(slot model.Slot) *pbslot.SlotResponse {

@@ -2,13 +2,14 @@ package model
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type Slot struct {
-	SlotID    *string   `json:"slotId,omitempty" redis:"slotId"`
+	SlotID    string    `json:"slotId,omitempty" redis:"slotId"`
 	DateTime  time.Time `json:"dateTime" redis:"dateTime"`
 	Location  string    `json:"location,omitempty" redis:"location"`
 	Available bool      `json:"available,omitempty" redis:"available"`
@@ -16,7 +17,7 @@ type Slot struct {
 
 func (slot *Slot) ToMap() map[string]string {
 	return map[string]string{
-		"slotId":    *slot.SlotID,
+		"slotId":    slot.SlotID,
 		"dateTime":  slot.DateTime.Format(time.RFC3339),
 		"location":  slot.Location,
 		"available": fmt.Sprintf("%t", slot.Available),
@@ -24,7 +25,7 @@ func (slot *Slot) ToMap() map[string]string {
 }
 
 func NewSlotFromMap(h map[string]string) (*Slot, error) {
-	slotId, ok := h["slotId"]
+	slotID, ok := h["slotId"]
 	if !ok {
 		return nil, errors.New("slotId is not in hash")
 	}
@@ -41,7 +42,7 @@ func NewSlotFromMap(h map[string]string) (*Slot, error) {
 		return nil, errors.Wrap(err, "failed to parse available")
 	}
 	return &Slot{
-		SlotID:    &slotId,
+		SlotID:    slotID,
 		DateTime:  dateTime,
 		Location:  location,
 		Available: available,
@@ -52,4 +53,10 @@ func NewSlotRedisId(location string, dateTime time.Time) string {
 	dStr := dateTime.Format("2006-01-02")
 	tStr := dateTime.Format("15-04")
 	return fmt.Sprintf("slot:%s:%s:%s", location, dStr, tStr)
+}
+
+func NewSlotRedisIDFromReservationID(reservationID string) string {
+	// the reservationID is in format reservation:<slotID>
+	// so we can just replace the first part of the string
+	return reservationID[12:]
 }
