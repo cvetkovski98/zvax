@@ -5,11 +5,11 @@ import (
 	"net"
 
 	"github.com/cvetkovski98/zvax-common/gen/pbslot"
+	"github.com/cvetkovski98/zvax-common/pkg/redis"
 	"github.com/cvetkovski98/zvax-slots/internal/config"
 	"github.com/cvetkovski98/zvax-slots/internal/delivery"
 	"github.com/cvetkovski98/zvax-slots/internal/repository"
 	"github.com/cvetkovski98/zvax-slots/internal/service"
-	"github.com/cvetkovski98/zvax-slots/pkg/redis"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -37,7 +37,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	log.Printf("Listening on %s://%s...", network, address)
 	cfg := config.GetConfig()
-	rdb, err := redis.NewRedisConn(cfg.Db, cfg.Pool)
+	rdb, err := redis.NewRedisConn(cfg.Redis)
 	if err != nil {
 		log.Fatalf("failed to connect to Redis: %v", err)
 	}

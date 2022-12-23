@@ -1,6 +1,6 @@
 package config
 
-type MinIOConfig struct {
+type MinIO struct {
 	Endpoint     string `mapstructure:"endpoint"`
 	RootUser     string `mapstructure:"root_user"`
 	RootPassword string `mapstructure:"root_password"`

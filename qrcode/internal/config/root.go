@@ -2,12 +2,13 @@ package config
 
 import (
 	"github.com/spf13/viper"
+
+	"github.com/cvetkovski98/zvax-common/pkg/config"
 )
 
 type Config struct {
-	Db    DbConfig    `mapstructure:"db"`
-	Pool  PoolConfig  `mapstructure:"db.pool"`
-	Minio MinIOConfig `mapstructure:"minio"`
+	PostgreSQL config.PostgreSQL `mapstructure:"db"`
+	MinIO      config.MinIO      `mapstructure:"minio"`
 }
 
 func LoadConfig(name string) error {

@@ -4,7 +4,8 @@ import (
 	"log"
 
 	"github.com/cvetkovski98/zvax-auth/internal/config"
-	"github.com/cvetkovski98/zvax-auth/pkg/postgresql"
+	"github.com/cvetkovski98/zvax-auth/internal/model/migrations"
+	"github.com/cvetkovski98/zvax-common/pkg/postgresql"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +18,11 @@ var migrateCommand = &cobra.Command{
 
 func migrate(cmd *cobra.Command, args []string) error {
 	cfg := config.GetConfig()
-	db, err := postgresql.NewPgDb(&cfg.Db, &cfg.Pool)
+	db, err := postgresql.NewPgDb(&cfg.PostgreSQL)
 	if err != nil {
 		return err
 	}
-	if err = postgresql.Migrate(cmd.Context(), db); err != nil {
+	if err = postgresql.Migrate(cmd.Context(), db, migrations.Migrations); err != nil {
 		log.Fatal(err)
 		return err
 	}

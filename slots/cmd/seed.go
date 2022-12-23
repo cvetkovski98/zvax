@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cvetkovski98/zvax-common/pkg/redis"
 	"github.com/cvetkovski98/zvax-slots/internal/config"
 	"github.com/cvetkovski98/zvax-slots/internal/model"
 	"github.com/cvetkovski98/zvax-slots/internal/repository"
-	"github.com/cvetkovski98/zvax-slots/pkg/redis"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +54,7 @@ func seed(cmd *cobra.Command, args []string) error {
 	}
 
 	cfg := config.GetConfig()
-	rdb, err := redis.NewRedisConn(cfg.Db, cfg.Pool)
+	rdb, err := redis.NewRedisConn(cfg.Redis)
 	if err != nil {
 		return err
 	}

@@ -4,13 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/cvetkovski98/zvax-auth/internal/model/migrations"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
 )
 
-func Migrate(ctx context.Context, db *bun.DB) error {
-	m := migrate.NewMigrator(db, migrations.Migrations)
+func Migrate(ctx context.Context, db *bun.DB, migrations *migrate.Migrations) error {
+	m := migrate.NewMigrator(db, migrations)
 	if err := m.Init(ctx); err != nil {
 		return err
 	}

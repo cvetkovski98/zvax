@@ -19,11 +19,11 @@ func init() {
 
 func createBucket(cmd *cobra.Command, args []string) error {
 	cfg := config.GetConfig()
-	minioClient, err := minio.NewMinioClient(&cfg.Minio)
+	minioClient, err := minio.NewMinioClient(&cfg.MinIO)
 	if err != nil {
 		return err
 	}
-	bucket := cfg.Minio.BucketName
+	bucket := cfg.MinIO.BucketName
 	if cmd.Flag("bucket").Value.String() != "" {
 		bucket = cmd.Flag("bucket").Value.String()
 	}

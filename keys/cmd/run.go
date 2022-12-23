@@ -5,11 +5,11 @@ import (
 	"net"
 
 	"github.com/cvetkovski98/zvax-common/gen/pbkey"
+	"github.com/cvetkovski98/zvax-common/pkg/postgresql"
 	"github.com/cvetkovski98/zvax-keys/internal/config"
 	"github.com/cvetkovski98/zvax-keys/internal/delivery"
 	"github.com/cvetkovski98/zvax-keys/internal/repository"
 	"github.com/cvetkovski98/zvax-keys/internal/service"
-	"github.com/cvetkovski98/zvax-keys/pkg/postgresql"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -37,7 +37,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	log.Printf("Listening on %s://%s...", network, address)
 	cfg := config.GetConfig()
-	db, err := postgresql.NewPgDb(&cfg.Db, &cfg.Pool)
+	db, err := postgresql.NewPgDb(&cfg.PostgreSQL)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}

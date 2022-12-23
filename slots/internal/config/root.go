@@ -1,12 +1,12 @@
 package config
 
 import (
+	"github.com/cvetkovski98/zvax-common/pkg/config"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Db   DbConfig   `mapstructure:"db"`
-	Pool PoolConfig `mapstructure:"db.pool"`
+	Redis config.Redis `mapstructure:"db"`
 }
 
 func LoadConfig(name string) error {
