@@ -1,0 +1,15 @@
+[submodule "auth"]
+	path = auth
+	url = git@github.com:cvetkovski98/zvax-auth.git
+[submodule "keys"]
+	path = keys
+	url = git@github.com:cvetkovski98/zvax-keys.git
+[submodule "common"]
+	path = common
+	url = git@github.com:cvetkovski98/zvax-common.git
+[submodule "qrcode"]
+	path = qrcode
+	url = git@github.com:cvetkovski98/zvax-qrcode.git
+[submodule "slots"]
+	path = slots
+	url = git@github.com:cvetkovski98/zvax-slots.git
