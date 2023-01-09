@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  protoc:
+    build:
+      context: ./common
+      dockerfile: Dockerfile
+    image: olivercvetkovski/zvax-protoc:latest

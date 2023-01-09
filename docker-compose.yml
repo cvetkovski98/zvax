@@ -1,21 +1,57 @@
 version: "3.9"
 services:
-
-  protoc:
-    build:
-      context: ./common
-      dockerfile: Dockerfile
-    image: olivercvetkovski/zvax-protoc:latest
-
   auth:
     build:
       context: ./auth
-      dockerfile: Dockerfile
+      dockerfile: ../Dockerfile
     image: olivercvetkovski/zvax-auth:latest
+    depends_on:
+      - postgres
     command:
       - run
+      - --config=config.docker.yaml
     volumes:
-      - ./auth/config:/app/config
+      - ./auth/config:/app/config:ro
+
+  keys:
+    build:
+      context: ./keys
+      dockerfile: ../Dockerfile
+    image: olivercvetkovski/zvax-keys:latest
+    depends_on:
+      - postgres
+    command:
+      - run
+      - --config=config.docker.yaml
+    volumes:
+      - ./keys/config:/app/config:ro
+
+  qrcode:
+    build:
+      context: ./qrcode
+      dockerfile: ../Dockerfile
+    image: olivercvetkovski/zvax-qrcode:latest
+    depends_on:
+      - postgres
+      - minio
+    command:
+      - run
+      - --config=config.docker.yaml
+    volumes:
+      - ./qrcode/config:/app/config:ro
+
+  slots:
+    build:
+      context: ./slots
+      dockerfile: ../Dockerfile
+    image: olivercvetkovski/zvax-slots:latest
+    depends_on:
+      - redis
+    command:
+      - run
+      - --config=config.docker.yaml
+    volumes:
+      - ./slots/config:/app/config:ro
 
   redis:
     image: redis/redis-stack-server
@@ -41,7 +77,6 @@ services:
     ports:
       - "5432:5432"
 
-  # pgadmin with no authentication
   pgadmin:
     image: dpage/pgadmin4
     environment:
