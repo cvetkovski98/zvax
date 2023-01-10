@@ -19,7 +19,7 @@ RUN go mod download
 COPY . .
 
 # build the Go app
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /service .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -buildvcs=false -o /service .
 
 # final stage
 FROM scratch AS final

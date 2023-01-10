@@ -1,0 +1,210 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - "master"
+  workflow_dispatch:
+
+jobs:
+  build-proto:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      -
+        name: Determine step run
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            common:
+              - 'common'
+      -
+        name: Set up QEMU
+        if: steps.filter.outputs.common == true
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        if: steps.filter.outputs.common == true
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        if: steps.filter.outputs.common == true
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and Push Image
+        if: steps.filter.outputs.common == true
+        run: |
+          docker compose -f docker-compose.protoc.yml build
+          docker compose -f docker-compose.protoc.yml push
+
+  build-auth:
+    runs-on: ubuntu-latest
+    needs: [ build-proto ]
+    if: ${{ success() }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      -
+        name: Determine step run
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'common'
+              - 'auth'
+      -
+        name: Set up QEMU
+        if: steps.filter.outputs.auth == true
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        if: steps.filter.outputs.auth == true
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        if: steps.filter.outputs.auth == true
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and Push Image
+        if: steps.filter.outputs.auth == true
+        run: |
+          docker compose build auth
+          docker compose push auth
+
+  build-keys:
+    runs-on: ubuntu-latest
+    needs: [ build-proto ]
+    if: ${{ success() }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      -
+        name: Determine step run
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            keys:
+              - 'common'
+              - 'keys'
+      -
+        name: Set up QEMU
+        if: steps.filter.outputs.keys == true
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        if: steps.filter.outputs.keys == true
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        if: steps.filter.outputs.keys == true
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and Push Image
+        if: steps.filter.outputs.keys == true
+        run: |
+          docker compose build keys
+          docker compose push keys
+
+  build-qrcode:
+    runs-on: ubuntu-latest
+    needs: [ build-proto ]
+    if: ${{ success() }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      -
+        name: Determine step run
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            qrcode:
+              - 'common'
+              - 'qrcode'
+      -
+        name: Set up QEMU
+        if: steps.filter.outputs.qrcode == true
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        if: steps.filter.outputs.qrcode == true
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        if: steps.filter.outputs.qrcode == true
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and Push Image
+        if: steps.filter.outputs.qrcode == true
+        run: |
+          docker compose build qrcode
+          docker compose push qrcode
+
+  build-slots:
+      runs-on: ubuntu-latest
+      needs: [ build-proto ]
+      if: ${{ success() }}
+      steps:
+        -
+          name: Checkout
+          uses: actions/checkout@v3
+          with:
+            submodules: recursive
+        -
+          name: Determine step run
+          uses: dorny/paths-filter@v2
+          id: filter
+          with:
+            filters: |
+              slots:
+                - 'common'
+                - 'slots'
+        -
+          name: Set up QEMU
+          if: steps.filter.outputs.slots == true
+          uses: docker/setup-qemu-action@v2
+        -
+          name: Set up Docker Build
+          if: steps.filter.outputs.slots == true
+          uses: docker/setup-buildx-action@v2
+        -
+          name: Login to Docker Hu
+          if: steps.filter.outputs.slots == true
+          uses: docker/login-action@v2
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        -
+          name: Build and Push Image
+          if: steps.filter.outputs.slots == true
+          run: |
+            docker compose build slots
+            docker compose push slots
