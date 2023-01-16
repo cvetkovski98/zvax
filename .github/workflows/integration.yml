@@ -23,6 +23,9 @@ jobs:
           filters: |
             common:
               - 'common'
+              - 'docker-compose.protoc.yaml'
+              - 'docker-compose.yaml'
+              - 'Dockerfile'
       -
         name: Set up QEMU
         if: steps.filter.outputs.common == 'true'
@@ -42,8 +45,8 @@ jobs:
         name: Build and Push Image
         if: steps.filter.outputs.common == 'true'
         run: |
-          docker compose -f docker-compose.protoc.yml build
-          docker compose -f docker-compose.protoc.yml push
+          docker compose -f docker-compose.protoc.yaml build
+          docker compose -f docker-compose.protoc.yaml push
 
   build-auth:
     runs-on: ubuntu-latest
@@ -63,6 +66,9 @@ jobs:
           filters: |
             auth:
               - 'common'
+              - 'docker-compose.protoc.yaml'
+              - 'docker-compose.yaml'
+              - 'Dockerfile'
               - 'auth'
       -
         name: Set up QEMU
@@ -104,6 +110,9 @@ jobs:
           filters: |
             keys:
               - 'common'
+              - 'docker-compose.protoc.yaml'
+              - 'docker-compose.yaml'
+              - 'Dockerfile'
               - 'keys'
       -
         name: Set up QEMU
@@ -145,6 +154,9 @@ jobs:
           filters: |
             qrcode:
               - 'common'
+              - 'docker-compose.protoc.yaml'
+              - 'docker-compose.yaml'
+              - 'Dockerfile'
               - 'qrcode'
       -
         name: Set up QEMU
@@ -186,6 +198,9 @@ jobs:
             filters: |
               slots:
                 - 'common'
+                - 'docker-compose.protoc.yaml'
+                - 'docker-compose.yaml'
+                - 'Dockerfile'
                 - 'slots'
         -
           name: Set up QEMU
