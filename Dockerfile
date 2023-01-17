@@ -22,7 +22,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -buildvcs=false -o /service .
 
 # final stage
-FROM scratch AS final
+FROM alpine:3.17 AS final
 
 WORKDIR /app
 
