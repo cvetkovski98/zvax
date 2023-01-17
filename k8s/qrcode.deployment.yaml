@@ -23,7 +23,7 @@ spec:
         ]
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
-            value: /secrets/zvax-project-access-key.json
+            value: /etc/gcp/zvax-project-access-key.json
         resources:
           limits:
             memory: "128Mi"
@@ -39,7 +39,7 @@ spec:
             mountPath: "/app/config"
             readOnly: true
           - name: qrcode-sa-zvax
-            mountPath: "/secrets"
+            mountPath: "/etc/gcp"
             readOnly: true
       volumes:
         - name: qrcode-secret-volume
