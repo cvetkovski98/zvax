@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slots-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: slots
+  template:
+    metadata:
+      labels:
+        service: slots
+    spec:
+      containers:
+      - name: slots-deployment
+        image: olivercvetkovski/zvax-slots:latest
+        command: [
+          "/app/service",
+          "run",
+          "--config=slots.gcp.config.yaml",
+          "--address=:5051"
+        ]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5051
+          name: slots-pod-port
+        volumeMounts:
+          - name: slots-secret-volume
+            mountPath: "/app/config"
+            readOnly: true
+      volumes:
+        - name: slots-secret-volume
+          secret:
+            secretName: slots-secret
+            optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: slots-service
+spec:
+  type: ClusterIP
+  selector:
+    service: slots
+  ports:
+  - port: 80
+    targetPort: slots-pod-port
+    name: slots-srv-port

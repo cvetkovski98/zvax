@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qrcode-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: qrcode
+  template:
+    metadata:
+      labels:
+        service: qrcode
+    spec:
+      containers:
+      - name: qrcode-deployment
+        image: olivercvetkovski/zvax-qrcode:latest
+        command: [
+          "/app/service",
+          "run",
+          "--config=qrcode.gcp.config.yaml",
+          "--address=:5051"
+        ]
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /secrets/zvax-project-access-key.json
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5051
+          name: qrcode-pod-port
+        volumeMounts:
+          - name: qrcode-secret-volume
+            mountPath: "/app/config"
+            readOnly: true
+          - name: qrcode-sa-zvax
+            mountPath: "/secrets"
+            readOnly: true
+      volumes:
+        - name: qrcode-secret-volume
+          secret:
+            secretName: qrcode-secret
+            optional: false
+        - name: qrcode-sa-zvax
+          secret:
+            secretName: sa-secret
+            optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qrcode-service
+spec:
+  type: ClusterIP
+  selector:
+    service: qrcode
+  ports:
+  - port: 80
+    targetPort: qrcode-pod-port
+    name: qrcode-srv-port

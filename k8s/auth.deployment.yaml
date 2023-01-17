@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: auth
+  template:
+    metadata:
+      labels:
+        service: auth
+    spec:
+      containers:
+      - name: auth-deployment
+        image: olivercvetkovski/zvax-auth:latest
+        command: [
+          "/app/service",
+          "run",
+          "--config=auth.gcp.config.yaml",
+          "--address=:5051"
+        ]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5051
+          name: auth-pod-port
+        volumeMounts:
+          - name: auth-secret-volume
+            mountPath: "/app/config"
+            readOnly: true
+      volumes:
+        - name: auth-secret-volume
+          secret:
+            secretName: auth-secret
+            optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  type: ClusterIP
+  selector:
+    service: auth
+  ports:
+  - port: 80
+    targetPort: auth-pod-port
+    name: auth-srv-port

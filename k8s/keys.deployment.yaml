@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keys-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      service: keys
+  template:
+    metadata:
+      labels:
+        service: keys
+    spec:
+      containers:
+      - name: keys-deployment
+        image: olivercvetkovski/zvax-keys:latest
+        command: [
+          "/app/service",
+          "run",
+          "--config=keys.gcp.config.yaml",
+          "--address=:5051"
+        ]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5051
+          name: keys-pod-port
+        volumeMounts:
+          - name: keys-secret-volume
+            mountPath: "/app/config"
+            readOnly: true
+      volumes:
+        - name: keys-secret-volume
+          secret:
+            secretName: keys-secret
+            optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keys-service
+spec:
+  type: ClusterIP
+  selector:
+    service: keys
+  ports:
+  - port: 80
+    targetPort: keys-pod-port
+    name: keys-srv-port
