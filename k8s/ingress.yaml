@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: zvax-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "true"
+    kubernetes.io/ingress.global-static-ip-name: "zvax-gke-ip"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /auth
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: auth-service
+            port:
+              name: auth-grpc
+      - path: /keys
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: keys-service
+            port:
+              name: keys-grpc
+      - path: /qrcode
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: qrcode-service
+            port:
+              name: qrcode-grpc
+      - path: /slots
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: slots-service
+            port:
+              name: slots-grpc

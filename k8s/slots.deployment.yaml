@@ -30,7 +30,9 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 5051
-          name: slots-pod-port
+          name: grpc-port
+        - containerPort: 80
+          name: healthz-port
         volumeMounts:
           - name: slots-secret-volume
             mountPath: "/app/config"
@@ -45,11 +47,16 @@ apiVersion: v1
 kind: Service
 metadata:
   name: slots-service
+  annotations:
+    cloud.google.com/app-protocols: '{"slots-grpc":"HTTP2", "slots-healthz":"HTTP"}'
 spec:
   type: ClusterIP
   selector:
     service: slots
   ports:
+  - port: 50051
+    targetPort: grpc-port
+    name: slots-grpc
   - port: 80
-    targetPort: slots-pod-port
-    name: slots-srv-port
+    targetPort: healthz-port
+    name: slots-healthz

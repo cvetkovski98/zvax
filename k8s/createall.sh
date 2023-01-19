@@ -1,4 +1,4 @@
-helm install redis --set auth.password=$REDIS_PASSWORD --set replica.replicaCount=3 bitnami/redis
+helm install redis --set auth.password=$REDIS_PASSWORD --set replica.replicaCount=1 bitnami/redis
 
 # create secrets
 kubectl create secret generic auth-secret --from-file=./secrets/gcp/auth.gcp.config.yaml
@@ -12,3 +12,7 @@ kubectl apply -f ./auth.deployment.yaml
 kubectl apply -f ./keys.deployment.yaml
 kubectl apply -f ./qrcode.deployment.yaml
 kubectl apply -f ./slots.deployment.yaml
+kubectl apply -f ./ingress.yaml
+
+# set healthcheck confgi
+kubectl apply -f ./healthz.config.yaml

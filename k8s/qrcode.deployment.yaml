@@ -33,7 +33,9 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 5051
-          name: qrcode-pod-port
+          name: grpc-port
+        - containerPort: 80
+          name: healthz-port
         volumeMounts:
           - name: qrcode-secret-volume
             mountPath: "/app/config"
@@ -55,11 +57,16 @@ apiVersion: v1
 kind: Service
 metadata:
   name: qrcode-service
+  annotations:
+    cloud.google.com/app-protocols: '{"qrcode-grpc":"HTTP2", "qrcode-healthz":"HTTP"}'
 spec:
   type: ClusterIP
   selector:
     service: qrcode
   ports:
+  - port: 50051
+    targetPort: grpc-port
+    name: qrcode-grpc
   - port: 80
-    targetPort: qrcode-pod-port
-    name: qrcode-srv-port
+    targetPort: healthz-port
+    name: qrcode-healthz

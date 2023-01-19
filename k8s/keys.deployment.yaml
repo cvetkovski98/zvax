@@ -30,7 +30,9 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 5051
-          name: keys-pod-port
+          name: grpc-port
+        - containerPort: 80
+          name: healthz-port
         volumeMounts:
           - name: keys-secret-volume
             mountPath: "/app/config"
@@ -45,11 +47,16 @@ apiVersion: v1
 kind: Service
 metadata:
   name: keys-service
+  annotations:
+    cloud.google.com/app-protocols: '{"keys-grpc":"HTTP2", "keys-healthz":"HTTP"}'
 spec:
   type: ClusterIP
   selector:
     service: keys
   ports:
+  - port: 50051
+    targetPort: grpc-port
+    name: keys-grpc
   - port: 80
-    targetPort: keys-pod-port
-    name: keys-srv-port
+    targetPort: healthz-port
+    name: keys-healthz
