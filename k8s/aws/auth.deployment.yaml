@@ -18,16 +18,16 @@ spec:
         command: [
           "/app/service",
           "run",
-          "--config=auth.gcp.config.yaml",
+          "--config=auth.aws.config.yaml",
           "--address=:5051"
         ]
         resources:
           limits:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
           requests:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
         ports:
         - containerPort: 5051
           name: grpc-port
@@ -47,8 +47,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: auth-service
-  annotations:
-    cloud.google.com/app-protocols: '{"auth-grpc":"HTTP2", "auth-healthz":"HTTP"}'
 spec:
   type: ClusterIP
   selector:

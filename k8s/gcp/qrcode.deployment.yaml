@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qrcode-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: qrcode
+  template:
+    metadata:
+      labels:
+        service: qrcode
+    spec:
+      containers:
+      - name: qrcode-deployment
+        image: olivercvetkovski/zvax-qrcode:latest
+        command: [
+          "/app/service",
+          "run",
+          "--config=qrcode.gcp.config.yaml",
+          "--address=:5051"
+        ]
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /etc/gcp/zvax-project-access-key.json
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "125m"
+          requests:
+            memory: "128Mi"
+            cpu: "125m"
+        ports:
+        - containerPort: 5051
+          name: grpc-port
+        - containerPort: 80
+          name: healthz-port
+        volumeMounts:
+          - name: qrcode-secret-volume
+            mountPath: "/app/config"
+            readOnly: true
+          - name: qrcode-sa-zvax
+            mountPath: "/etc/gcp"
+            readOnly: true
+      volumes:
+        - name: qrcode-secret-volume
+          secret:
+            secretName: qrcode-secret
+            optional: false
+        - name: qrcode-sa-zvax
+          secret:
+            secretName: sa-secret
+            optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qrcode-service
+  annotations:
+    cloud.google.com/app-protocols: '{"qrcode-grpc":"HTTP2", "qrcode-healthz":"HTTP"}'
+spec:
+  type: ClusterIP
+  selector:
+    service: qrcode
+  ports:
+  - port: 50051
+    targetPort: grpc-port
+    name: qrcode-grpc
+  - port: 80
+    targetPort: healthz-port
+    name: qrcode-healthz

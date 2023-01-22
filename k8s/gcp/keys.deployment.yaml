@@ -24,10 +24,10 @@ spec:
         resources:
           limits:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
           requests:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
         ports:
         - containerPort: 5051
           name: grpc-port

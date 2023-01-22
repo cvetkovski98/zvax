@@ -1,62 +1,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: slots-deployment
+  name: keys-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: slots
+      service: keys
   template:
     metadata:
       labels:
-        service: slots
+        service: keys
     spec:
       containers:
-      - name: slots-deployment
-        image: olivercvetkovski/zvax-slots:latest
+      - name: keys-deployment
+        image: olivercvetkovski/zvax-keys:latest
         command: [
           "/app/service",
           "run",
-          "--config=slots.gcp.config.yaml",
+          "--config=keys.aws.config.yaml",
           "--address=:5051"
         ]
         resources:
           limits:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
           requests:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
         ports:
         - containerPort: 5051
           name: grpc-port
         - containerPort: 80
           name: healthz-port
         volumeMounts:
-          - name: slots-secret-volume
+          - name: keys-secret-volume
             mountPath: "/app/config"
             readOnly: true
       volumes:
-        - name: slots-secret-volume
+        - name: keys-secret-volume
           secret:
-            secretName: slots-secret
+            secretName: keys-secret
             optional: false
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: slots-service
+  name: keys-service
   annotations:
-    cloud.google.com/app-protocols: '{"slots-grpc":"HTTP2", "slots-healthz":"HTTP"}'
+    cloud.google.com/app-protocols: '{"keys-grpc":"HTTP2", "keys-healthz":"HTTP"}'
 spec:
   type: ClusterIP
   selector:
-    service: slots
+    service: keys
   ports:
   - port: 50051
     targetPort: grpc-port
-    name: slots-grpc
+    name: keys-grpc
   - port: 80
     targetPort: healthz-port
-    name: slots-healthz
+    name: keys-healthz

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: auth
+  template:
+    metadata:
+      labels:
+        service: auth
+    spec:
+      containers:
+      - name: auth-deployment
+        image: olivercvetkovski/zvax-auth:latest
+        command: [
+          "/app/service",
+          "run",
+          "--config=auth.gcp.config.yaml",
+          "--address=:5051"
+        ]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "125m"
+          requests:
+            memory: "128Mi"
+            cpu: "125m"
+        ports:
+        - containerPort: 5051
+          name: grpc-port
+        - containerPort: 80
+          name: healthz-port
+        volumeMounts:
+          - name: auth-secret-volume
+            mountPath: "/app/config"
+            readOnly: true
+      volumes:
+        - name: auth-secret-volume
+          secret:
+            secretName: auth-secret
+            optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  annotations:
+    cloud.google.com/app-protocols: '{"auth-grpc":"HTTP2", "auth-healthz":"HTTP"}'
+spec:
+  type: ClusterIP
+  selector:
+    service: auth
+  ports:
+  - port: 50051
+    targetPort: grpc-port
+    name: auth-grpc
+  - port: 80
+    targetPort: healthz-port
+    name: auth-healthz

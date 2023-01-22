@@ -18,19 +18,19 @@ spec:
         command: [
           "/app/service",
           "run",
-          "--config=qrcode.gcp.config.yaml",
+          "--config=qrcode.aws.config.yaml",
           "--address=:5051"
         ]
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
-            value: /etc/gcp/zvax-project-access-key.json
+            value: /etc/secrets/zvax-project-access-key.json
         resources:
           limits:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
           requests:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "125m"
         ports:
         - containerPort: 5051
           name: grpc-port
@@ -40,15 +40,15 @@ spec:
           - name: qrcode-secret-volume
             mountPath: "/app/config"
             readOnly: true
-          - name: qrcode-sa-zvax
-            mountPath: "/etc/gcp"
+          - name: qrcode-sa-volume
+            mountPath: "/etc/secrets"
             readOnly: true
       volumes:
         - name: qrcode-secret-volume
           secret:
             secretName: qrcode-secret
             optional: false
-        - name: qrcode-sa-zvax
+        - name: qrcode-sa-volume
           secret:
             secretName: sa-secret
             optional: false
