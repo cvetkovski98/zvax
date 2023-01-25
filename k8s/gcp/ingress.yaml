@@ -4,8 +4,6 @@ metadata:
   name: zvax-ingress
   namespace: default
   annotations:
-    kubernetes.io/ingress.class: "gce"
-    kubernetes.io/ingress.allow-http: "true"
     kubernetes.io/ingress.global-static-ip-name: "zvax-gke-ip"
 spec:
   rules:

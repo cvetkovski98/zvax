@@ -49,6 +49,7 @@ metadata:
   name: slots-service
   annotations:
     cloud.google.com/app-protocols: '{"slots-grpc":"HTTP2", "slots-healthz":"HTTP"}'
+    cloud.google.com/backend-config: '{"default": "healthcheck-config"}'
 spec:
   type: ClusterIP
   selector:

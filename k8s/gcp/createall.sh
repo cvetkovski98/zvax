@@ -17,12 +17,12 @@ kubectl create secret generic qrcode-secret --from-file=./secrets/qrcode.gcp.con
 kubectl create secret generic slots-secret --from-file=./secrets/slots.gcp.config.yaml
 kubectl create secret generic sa-secret --from-file=./secrets/zvax-project-access-key.json
 
+# set healthcheck confgi
+kubectl apply -f ./healthz.config.yaml
+
 # run deployments
 kubectl apply -f ./auth.deployment.yaml
 kubectl apply -f ./keys.deployment.yaml
 kubectl apply -f ./qrcode.deployment.yaml
 kubectl apply -f ./slots.deployment.yaml
 kubectl apply -f ./ingress.yaml
-
-# set healthcheck confgi
-kubectl apply -f ./healthz.config.yaml

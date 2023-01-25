@@ -49,6 +49,7 @@ metadata:
   name: keys-service
   annotations:
     cloud.google.com/app-protocols: '{"keys-grpc":"HTTP2", "keys-healthz":"HTTP"}'
+    cloud.google.com/backend-config: '{"default": "healthcheck-config"}'
 spec:
   type: ClusterIP
   selector:

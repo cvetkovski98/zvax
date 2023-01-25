@@ -59,6 +59,7 @@ metadata:
   name: qrcode-service
   annotations:
     cloud.google.com/app-protocols: '{"qrcode-grpc":"HTTP2", "qrcode-healthz":"HTTP"}'
+    cloud.google.com/backend-config: '{"default": "healthcheck-config"}'
 spec:
   type: ClusterIP
   selector:

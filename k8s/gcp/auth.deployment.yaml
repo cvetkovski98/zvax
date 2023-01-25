@@ -49,6 +49,7 @@ metadata:
   name: auth-service
   annotations:
     cloud.google.com/app-protocols: '{"auth-grpc":"HTTP2", "auth-healthz":"HTTP"}'
+    cloud.google.com/backend-config: '{"default": "healthcheck-config"}'
 spec:
   type: ClusterIP
   selector:
